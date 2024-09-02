@@ -6,12 +6,12 @@ const Automation = sequelize.define('Automation', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  trigger: {
-    type: DataTypes.STRING,
+  triggers: {
+    type: DataTypes.ARRAY(DataTypes.STRING),  // Suporta múltiplos gatilhos
     allowNull: false
   },
-  action: {
-    type: DataTypes.STRING,
+  actions: {
+    type: DataTypes.ARRAY(DataTypes.STRING),  // Suporta múltiplas ações
     allowNull: false
   },
   userId: {

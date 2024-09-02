@@ -15,10 +15,14 @@ const User = sequelize.define('User', {
   password: {
     type: DataTypes.STRING,
     allowNull: false
+  },
+  role: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: 'user'  // Pode ser 'admin' ou 'user'
   }
 });
 
-// Hash da senha antes de salvar o usuário
 User.beforeCreate(async (user) => {
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(user.password, salt);

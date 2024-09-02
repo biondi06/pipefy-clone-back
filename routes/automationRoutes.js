@@ -12,8 +12,8 @@ router.get('/automations', async (req, res) => {
 });
 
 router.post('/automations', async (req, res) => {
-  const { name, trigger, action } = req.body;
-  const automation = await Automation.create({ name, trigger, action, userId: req.user });
+  const { name, triggers, actions } = req.body;
+  const automation = await Automation.create({ name, triggers, actions, userId: req.user });
   res.status(201).json(automation);
 });
 

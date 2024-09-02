@@ -1,12 +1,20 @@
 const express = require('express');
-const userRoutes = require('./routes/userRoutes');
-
+const http = require('http');
+const { Server } = require('socket.io');
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+const taskRoutes = require('./routes/taskRoutes');
+
 app.use(express.json());
+app.use('/api', taskRoutes);
 
-app.use('/api', userRoutes);
+io.on('connection', (socket) => {
+  console.log('Novo cliente conectado:', socket.id);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  socket.on('disconnect', () => {
+    console.log('Cliente desconectado:', socket.id);
+  });
 });
+
+module.exports = { app, server, io };
