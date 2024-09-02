@@ -1,25 +1,25 @@
 const express = require('express');
 const router = express.Router();
 
-// Simulação de dados de usuários
-const users = [
+// Dados de exemplo (em uma aplicação real, você usaria um banco de dados)
+let users = [
   { id: 1, username: 'john_doe', email: 'john@example.com' },
   { id: 2, username: 'jane_doe', email: 'jane@example.com' }
 ];
 
-// Rota GET /api/users - Retorna todos os usuários
+// Rota GET para obter todos os usuários
 router.get('/users', (req, res) => {
   res.json(users);
 });
 
-// Rota POST /api/users - Cria um novo usuário (adiciona ao array)
+// Rota POST para criar um novo usuário
 router.post('/users', (req, res) => {
   const newUser = { id: users.length + 1, ...req.body };
   users.push(newUser);
   res.status(201).json(newUser);
 });
 
-// Rota PUT /api/users/:id - Atualiza um usuário existente
+// Rota PUT para atualizar um usuário existente
 router.put('/users/:id', (req, res) => {
   const user = users.find(u => u.id === parseInt(req.params.id));
   if (user) {
@@ -30,15 +30,10 @@ router.put('/users/:id', (req, res) => {
   }
 });
 
-// Rota DELETE /api/users/:id - Deleta um usuário
+// Rota DELETE para deletar um usuário
 router.delete('/users/:id', (req, res) => {
-  const index = users.findIndex(u => u.id === parseInt(req.params.id));
-  if (index !== -1) {
-    users.splice(index, 1);
-    res.json({ message: 'User deleted' });
-  } else {
-    res.status(404).json({ error: 'User not found' });
-  }
+  users = users.filter(u => u.id !== parseInt(req.params.id));
+  res.json({ message: 'User deleted' });
 });
 
 module.exports = router;
