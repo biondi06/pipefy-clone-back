@@ -1,31 +1,19 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
-const bcrypt = require('bcryptjs');
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = require('../config/database'); // Ajuste para o caminho correto do arquivo de configuração do banco de dados
 
 const User = sequelize.define('User', {
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
   email: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true
+    unique: true,
+    validate: {
+      isEmail: true,
+    },
   },
   password: {
     type: DataTypes.STRING,
-    allowNull: false
-  },
-  role: {
-    type: DataTypes.STRING,
     allowNull: false,
-    defaultValue: 'user'  // Pode ser 'admin' ou 'user'
-  }
-});
-
-User.beforeCreate(async (user) => {
-  const salt = await bcrypt.genSalt(10);
-  user.password = await bcrypt.hash(user.password, salt);
+  },
 });
 
 module.exports = User;

@@ -4,8 +4,8 @@ require('dotenv').config();
 const transporter = nodemailer.createTransport({
   service: 'Outlook365',
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    user: 'daniel.biondi@thomazalves.com.br',
+    pass: '53534125@Pb'
   }
 });
 

@@ -1,20 +1,23 @@
 const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
+const sequelize = require('./config/database');
+const authRoutes = require('./routes/authRoutes');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
-const taskRoutes = require('./routes/taskRoutes');
 
 app.use(express.json());
-app.use('/api', taskRoutes);
 
-io.on('connection', (socket) => {
-  console.log('Novo cliente conectado:', socket.id);
+// Rota de Autenticação
+app.use('/api', authRoutes);
 
-  socket.on('disconnect', () => {
-    console.log('Cliente desconectado:', socket.id);
+sequelize.sync().then(() => {
+  console.log('Banco de dados sincronizado');
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
   });
+}).catch((error) => {
+  console.error('Erro ao sincronizar o banco de dados:', error);
 });
-
-module.exports = { app, server, io };

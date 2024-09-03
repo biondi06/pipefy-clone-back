@@ -1,33 +1,34 @@
 const express = require('express');
-const { authMiddleware } = require('./authRoutes');
-const authorize = require('../middleware/authorization');
 const Task = require('../models/Task');
+const authMiddleware = require('../middleware/authMiddleware'); // Middleware de autenticação
 const transporter = require('../config/nodemailer');
-const { io } = require('../index');
-const logger = require('../config/logger');
+const io = require('../config/io'); // WebSocket
 
 const router = express.Router();
 
-router.use(authMiddleware);
+router.use(authMiddleware); // Aplicando o middleware de autenticação em todas as rotas
 
-router.post('/tasks', authorize('tasks', 'create'), async (req, res) => {
-  const { title, description } = req.body;
-  const task = await Task.create({ title, description, userId: req.user });
+// Criar uma nova tarefa
+router.post('/tasks', async (req, res) => {
+  try {
+    const task = await Task.create(req.body);
+    io.emit('taskCreated', task);
 
-  // Registrar log
-  logger.info(`Nova tarefa criada: ${title} por usuário ${req.user}`);
+    const mailOptions = {
+      from: 'daniel.biondi@thomazalves.com.br',
+      to: 'destinatario@dominio.com',
+      subject: 'Nova Tarefa Criada',
+      text: `Uma nova tarefa foi criada: ${task.title}\n\nDescrição: ${task.description}`
+    };
 
-  // Emitir evento e enviar email
-  io.emit('taskCreated', { title, description });
-  const mailOptions = {
-    from: 'daniel.biondi@thomazalves.com.br',
-    to: 'daniel.biondi@thomazalves.com.br',
-    subject: 'Nova Tarefa Criada',
-    text: `Uma nova tarefa foi criada: ${title}\n\nDescrição: ${description}`
-  };
-  transporter.sendMail(mailOptions);
+    transporter.sendMail(mailOptions);
 
-  res.status(201).json(task);
+    res.status(201).json(task);
+  } catch (error) {
+    res.status(400).json({ error: 'Erro ao criar tarefa' });
+  }
 });
 
-module.exports = router;
+// Outras rotas...
+
+module.exports = router; // Certifique-se de exportar corretamente o router
