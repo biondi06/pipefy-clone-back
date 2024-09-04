@@ -1,23 +1,16 @@
 const express = require('express');
-const sequelize = require('./config/database');
-const authRoutes = require('./routes/authRoutes');
-const dotenv = require('dotenv');
-
-dotenv.config();
+const cors = require('cors');
+const taskRoutes = require('./routes/taskRoutes');
+const formRoutes = require('./routes/formRoutes');  // Importando as rotas de formulário
 
 const app = express();
-
+app.use(cors());
 app.use(express.json());
 
-// Rota de Autenticação
-app.use('/api', authRoutes);
+app.use('/api', taskRoutes);
+app.use('/api', formRoutes);  // Usando as rotas de formulário
 
-sequelize.sync().then(() => {
-  console.log('Banco de dados sincronizado');
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
-  });
-}).catch((error) => {
-  console.error('Erro ao sincronizar o banco de dados:', error);
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
 });
