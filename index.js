@@ -1,16 +1,29 @@
 const express = require('express');
-const cors = require('cors');
-const taskRoutes = require('./routes/taskRoutes');
-const formRoutes = require('./routes/formRoutes');  // Importando as rotas de formulário
+const http = require('http');
+const { Server } = require('socket.io');
+const reportRoutes = require('./routes/reportRoutes');
 
 const app = express();
-app.use(cors());
+const server = http.createServer(app);
+const io = new Server(server);
+
 app.use(express.json());
+app.use('/api', reportRoutes);
 
-app.use('/api', taskRoutes);
-app.use('/api', formRoutes);  // Usando as rotas de formulário
+io.on('connection', (socket) => {
+  console.log('Novo cliente conectado:', socket.id);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+  // Enviar uma notificação a todos os clientes
+  socket.on('updateTask', (task) => {
+    io.emit('taskUpdated', task);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Cliente desconectado:', socket.id);
+  });
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
